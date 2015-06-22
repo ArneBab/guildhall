@@ -36,7 +36,9 @@ More options:
 
     guild --help
 
-For details see docs/installation.texi and docs/quickstart.texi
+For details see docs/installation.texi and docs/quickstart.texi as well as the wiki:
+
+https://github.com/ijp/guildhall/wiki/Getting-Started
 
 === Background ==========================================================
 
