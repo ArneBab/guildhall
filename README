@@ -19,8 +19,7 @@ Then get and install guildhall:
 
     git clone git@github.com/ijp/guildhall.git
     cd guildhall
-    ./autogen.sh && ./configure --prefix /usr && make
-    sudo make install
+    ./autogen.sh && ./configure --prefix /usr && make && sudo make install
 
 Finally add a minimal configuration
 
