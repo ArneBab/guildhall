@@ -33,6 +33,9 @@
   #:use-module (guildhall private utils)
   #:use-module (guildhall database)
   #:use-module (guildhall package)
+  #:use-module (guildhall destination fhs)
+  #:use-module (guildhall destination)
+  #:use-module (guildhall inventory)
   #:use-module (guildhall ui formatters))
 
 (define %summary "Show package information.")
@@ -48,9 +51,17 @@
       --version        Print version information.
 ")
 
+(define (search-load-path item)
+  %load-path)
+
+
 (define (dsp-db-item item)
   (dsp-package (database-item-package item)
-               (cat "Status: " (database-item-state item) "\n")))
+               (cat "Status: " (database-item-state item) "\n")
+               (cat "Path: " (let ((lib (package-category-inventory (database-item-package item) 'libraries)))
+                               (if (not lib) #f
+                                   lib)) ; TODO: lib is a zipper datastructure. Extract the paths. Then search the load-path. See spells/zipper-tree.scm
+                    "\n")))
 
 (define (parse-package-string s)
   (cond ((maybe-string->package s "=")
