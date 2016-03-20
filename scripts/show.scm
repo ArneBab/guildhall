@@ -35,6 +35,7 @@
   #:use-module (guildhall package)
   #:use-module (guildhall destination fhs)
   #:use-module (guildhall destination)
+  #:use-module (guildhall spells pathname)
   #:use-module (guildhall inventory)
   #:use-module (guildhall ui formatters))
 
@@ -57,11 +58,7 @@
 
 (define (dsp-db-item item)
   (dsp-package (database-item-package item)
-               (cat "Status: " (database-item-state item) "\n")
-               (cat "Path: " (let ((lib (package-category-inventory (database-item-package item) 'libraries)))
-                               (if (not lib) #f
-                                   lib)) ; TODO: lib is a zipper datastructure. Extract the paths. Then search the load-path. See spells/zipper-tree.scm
-                    "\n")))
+               (cat "Status: " (database-item-state item) "\n")))
 
 (define (parse-package-string s)
   (cond ((maybe-string->package s "=")
@@ -83,6 +80,13 @@
                        (database-items db name)))))))
     => (reverse result)))
 
+(define (directory-string db category)
+  (directory-namestring
+   (destination-pathname
+    ((@@ (guildhall database) database-destination) db)
+    (make-package 'PKG '((0)))
+    category "module.scm")))
+
 (define %mod (current-module))
 (define (main . args)
   (define bundles '())
@@ -96,5 +100,13 @@
       (database-add-bundles! db bundles)
       (fmt #t (fmt-join dsp-db-item
                         (find-db-items db packages)
-                        "\n"))))
+                        "\n"))
+      (fmt #t (cat "\nDestinations:\n"
+                   (fmt-join
+                    (lambda (category)
+                      (cat " - " (symbol->string category) ": /"
+                           (directory-string db category)))
+                    '(libraries executables documentation)
+                    "\n")
+                   "\n"))))
   (exit 0))
