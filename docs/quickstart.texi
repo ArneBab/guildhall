@@ -12,7 +12,7 @@ Guildhall where it can find software (@pxref{Packages}) to install. Create
 the file @file{~/.config/guildhall/config.scm} and add this line:
 
 @lisp
-(repository experimental "http://rotty.yi.org/doro/experimental")
+(repository shift-reset "http://shift-reset.com/doro/")
 @end lisp
 
 This tells Guildhall the location of the Andreas Rottmann's
