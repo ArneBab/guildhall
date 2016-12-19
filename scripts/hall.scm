@@ -29,10 +29,47 @@
 
 ;;; Code:
 
-(define-module (scripts hall))
+(define-module (scripts hall)
+  #:use-module (guildhall cli)
+  #:use-module (guildhall cli db)
+  #:use-module (guildhall ext fmt)
+  #:use-module (guildhall ext foof-loop)
+  #:use-module (guildhall private utils)
+  #:use-module (guildhall database)
+  #:use-module (guildhall package)
+  #:use-module (guildhall destination fhs)
+  #:use-module (guildhall destination)
+  #:use-module (guildhall spells pathname)
+  #:use-module (guildhall inventory)
+  #:use-module (guildhall ui formatters))
 
 (define %summary "Create your guild hall.")
+
+(define (directory-string db category)
+  (directory-namestring
+   (destination-pathname
+    ((@@ (guildhall database) database-destination) db)
+    (make-package 'PKG '((0)))
+    category "module.scm")))
+
+(define %mod (current-module))
+
 (define (main . args)
-  (write "hall")
-  (write args)
-  (newline))
+  (define bundles '())
+  (call-with-parsed-options/config+db
+      %mod args
+      (list
+       (make-option/arg
+        '("bundle" #\b)
+        (lambda (arg) (set! bundles (append bundles (list arg))))))
+    (lambda (packages config db)
+      (database-add-bundles! db bundles)
+      (fmt #t (cat "\nDestinations:\n"
+                   (fmt-join
+                    (lambda (category)
+                      (cat " - " (symbol->string category) ": /"
+                           (directory-string db category)))
+                    '(libraries executables documentation)
+                    "\n")
+                   "\n"))))
+)
